@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use App\Repository\ExercisesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass=ExercisesRepository::class)
+ * @ApiResource()
  */
 class Exercises
 {

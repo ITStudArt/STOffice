@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\MappedSuperclass()
@@ -12,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="`user`")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"patient"="Patient","therapist"="Therapist"})
+ * @ApiResource()
  */
 class User
 {
