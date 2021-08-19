@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\DiscriminatorMap({"patient"="Patient","therapist"="Therapist"})
  * @ApiResource(
  *     itemOperations={"get"},
- *     collectionOperations={},
+ *     collectionOperations={"post"},
  *     normalizationContext={
  *     "groups" = {"read"}
  *     }
