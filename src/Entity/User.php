@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\MappedSuperclass()
@@ -15,7 +16,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
  * @ORM\DiscriminatorMap({"patient"="Patient","therapist"="Therapist"})
  * @ApiResource()
  */
-class User
+class User implements PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -66,6 +67,22 @@ class User
 
     public function __construct(){
         $this->exercies = new ArrayCollection();
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getExercies(): ArrayCollection
+    {
+        return $this->exercies;
+    }
+
+    /**
+     * @param ArrayCollection $exercies
+     */
+    public function setExercies(ArrayCollection $exercies): void
+    {
+        $this->exercies = $exercies;
     }
 
     public function getId(): ?int

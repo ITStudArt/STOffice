@@ -62,4 +62,21 @@ class Exercises
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type): void
+    {
+        $this->type = $type;
+    }
+
 }
