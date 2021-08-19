@@ -61,12 +61,14 @@ class AppFixtures extends Fixture
         $exercise->setName('Exercise 1');
         $exercise->setPath('exercise_1_path');
         $exercise->setType($this->getReference('1st_type'));
+        $this->setReference('1st_type_ex',$exercise);
         $manager->persist($exercise);
 
         $exercise = new Exercises();
         $exercise->setName('Exercise 2');
         $exercise->setPath('exercise_2_path');
         $exercise->setType($this->getReference('2nd_type'));
+        $this->setReference('2nd_type_ex',$exercise);
         $manager->persist($exercise);
 
         $manager->flush();
@@ -82,6 +84,7 @@ class AppFixtures extends Fixture
         $user->setPhone($this->faker->phoneNumber);
         $user->setPhoto('example_photo_path_there');
         $this->addReference('user_patient_1',$user);
+        $user->setExercies($this->getReference('1st_type_ex'));
         $manager->persist($user);
         $patient = new Patient();
         $patient->setParentName($this->faker->firstName);
@@ -103,6 +106,8 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordHasher->hashPassword($user,'admin123'));
         $user->setPhone($this->faker->phoneNumber);
         $user->setPhoto('example_photo_path_there');
+        $user->setExercies($this->getReference('1st_type_ex'));
+        $user->setExercies($this->getReference('2nd_type_ex'));
         $this->addReference('user_therapist_1',$user);
         $manager->persist($user);
         $therapist = new Therapist();
@@ -113,11 +118,6 @@ class AppFixtures extends Fixture
         $this->addReference('therapist_1',$therapist);
         $manager->persist($therapist);
         $manager->flush();
-    }
-    public function loadTherapistPatient(ObjectManager $manager)
-    {
-        $therapist = $this->getReference('therapist_1');
-        $patient = $this->getReference('patient_1');
     }
     public function loadUsersExercises(ObjectManager $manager)
     {

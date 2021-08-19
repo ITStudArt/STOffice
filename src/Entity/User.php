@@ -57,7 +57,7 @@ class User implements PasswordAuthenticatedUserInterface
 
     /**
      * Many Users have Many Exercises.
-     * @ORM\ManyToMany(targetEntity="App\Entity\Exercises")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Exercises",cascade={"persist"})
      * @ORM\JoinTable(name="users_exercises",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id")}
@@ -78,11 +78,12 @@ class User implements PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @param ArrayCollection $exercies
+     * @param Exercises $exercies
      */
-    public function setExercies(ArrayCollection $exercies): void
+    public function setExercies(Exercises $exercie): void
     {
-        $this->exercies = $exercies;
+        if(!$this->exercies->contains($exercie))
+            $this->exercies[] = $exercie;
     }
 
     public function getId(): ?int
