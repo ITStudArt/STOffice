@@ -6,8 +6,10 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\MappedSuperclass()
@@ -22,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "groups" = {"read"}
  *     }
  * )
+ * @UniqueEntity("email")
  */
 class User implements PasswordAuthenticatedUserInterface
 {
@@ -36,24 +39,41 @@ class User implements PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=100)
      * @Groups({"read"})
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Groups({"read"})
+     * @Assert\NotBlank()
      */
     private $surname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Regex(
+     *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
+     *     message="Password must be 8 letters long, contain at least one digit, one uppercase letter and one lower case."
+     * )
      */
     private $password;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Expression(
+     *     "this.getPassword() === this.getRetypedPassword()",
+     *     message="Passwords doesn't match"
+     * )
+     */
+    private $retypedpassword;
 
     /**
      * @ORM\Column(type="string", length=20)
@@ -77,6 +97,7 @@ class User implements PasswordAuthenticatedUserInterface
      * @Groups({"read"})
      */
     private $exercies;
+
 
     public function __construct(){
         $this->exercies = new ArrayCollection();
@@ -183,6 +204,16 @@ class User implements PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         return null;
+    }
+
+    public function getRetypedPassword()
+    {
+        return $this->retypedpassword;
+    }
+
+    public function setRetypedPassword($retypedpassword): void
+    {
+        $this->retypedpassword = $retypedpassword;
     }
 
 
