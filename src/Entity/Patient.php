@@ -21,9 +21,10 @@ class Patient
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\ManyToOne(targetEntity="App\Entity\Therapist", inversedBy="id")
+     * @ORM\JoinColumn(nullable=true)
      */
-    private $therapist;
+    private $therapist_id;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -55,16 +56,20 @@ class Patient
         $this->id = $id;
     }
 
-    public function getTherapist(): ?string
+    /**
+     * @return mixed
+     */
+    public function getTherapistId()
     {
-        return $this->therapist;
+        return $this->therapist_id;
     }
 
-    public function setTherapist(string $therapist): self
+    /**
+     * @param mixed $therapist_id
+     */
+    public function setTherapistId($therapist_id): void
     {
-        $this->therapist = $therapist;
-
-        return $this;
+        $this->therapist_id = $therapist_id;
     }
 
     public function getParentName(): ?string
@@ -114,5 +119,6 @@ class Patient
 
         return $this;
     }
+
 
 }

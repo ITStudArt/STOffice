@@ -46,7 +46,7 @@ class User implements PasswordAuthenticatedUserInterface
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=9)
+     * @ORM\Column(type="string", length=20)
      */
     private $phone;
 
@@ -161,4 +161,18 @@ class User implements PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getRoles()
+    {
+        return ['ROLE_USER'];
+    }
+    public function getSalt()
+    {
+        return null;
+    }
+    public function eraseCredentials()
+    {
+        return null;
+    }
+
+
 }

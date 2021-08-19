@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TherapistRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 
@@ -34,6 +35,26 @@ class Therapist
      */
     private $hourly_rate;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Patient", mappedBy="id")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $therapist_patients;
+
+    public function __construct()
+    {
+        $this->therapist_patients = new ArrayCollection();
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTherapistPatients(): ArrayCollection
+    {
+        return $this->therapist_patients;
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,11 +81,9 @@ class Therapist
         return $this->account_number;
     }
 
-    public function setAccountNumber(?string $account_number): self
+    public function setAccountNumber(?string $account_number)
     {
         $this->account_number = $account_number;
-
-        return $this;
     }
 
     public function getHourlyRate(): ?string
