@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\MappedSuperclass()
@@ -14,7 +15,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @ORM\Table(name="`user`")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"patient"="Patient","therapist"="Therapist"})
- * @ApiResource()
+ * @ApiResource(
+ *     itemOperations={"get"},
+ *     collectionOperations={},
+ *     normalizationContext={
+ *     "groups" = {"read"}
+ *     }
+ * )
  */
 class User implements PasswordAuthenticatedUserInterface
 {
@@ -22,16 +29,19 @@ class User implements PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"read"})
      */
     private $surname;
 
@@ -47,11 +57,13 @@ class User implements PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Groups({"read"})
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"read"})
      */
     private $photo;
 
@@ -62,6 +74,7 @@ class User implements PasswordAuthenticatedUserInterface
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id")}
      *      )
+     * @Groups({"read"})
      */
     private $exercies;
 
@@ -69,10 +82,7 @@ class User implements PasswordAuthenticatedUserInterface
         $this->exercies = new ArrayCollection();
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getExercies(): ArrayCollection
+    public function getExercies()
     {
         return $this->exercies;
     }
