@@ -19,7 +19,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"patient"="Patient","therapist"="Therapist"})
  * @ApiResource(
- *     itemOperations={"get"},
+ *     itemOperations={
+ *     "get"={
+ *     "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *     }
+ * },
  *     collectionOperations={"post"},
  *     normalizationContext={
  *     "groups" = {"read"}

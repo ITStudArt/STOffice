@@ -5,10 +5,19 @@ namespace App\Entity;
 use App\Repository\ExercisesRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ExercisesRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={
+ *     "get",
+ *     "post"={
+ *          "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *      }
+ *     },
+ *     itemOperations={"get"}
+ * )
  */
 class Exercises
 {
@@ -21,16 +30,18 @@ class Exercises
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $path;
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\ExercisesType")
-     * @ORM\JoinColumn(name="type_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="type_id", referencedColumnName="id", nullable=false)
      */
     private $type;
 

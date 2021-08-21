@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ExercisesTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ExercisesTypeRepository::class)
@@ -21,11 +22,13 @@ class ExercisesType
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $type;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
      */
     private $icon;
 
