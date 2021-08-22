@@ -2,22 +2,29 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\ExercisesRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=ExercisesRepository::class)
  * @ApiResource(
  *     collectionOperations={
  *     "get",
  *     "post"={
- *          "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
- *      }
+ *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *          }
  *     },
- *     itemOperations={"get"}
+ *     itemOperations={"get"},
+ *
+ *     denormalizationContext={
+ *          "groups"={"post"}
+ *     }
  * )
+ * @UniqueEntity(fields={"name", "path"}, message="This file already exists")
  */
 class Exercises
 {

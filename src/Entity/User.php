@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,9 +25,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
  *     }
  * },
- *     collectionOperations={"post"},
+ *     collectionOperations={"post"
+ *     },
  *     normalizationContext={
  *     "groups" = {"read"}
+ *     },
+ *     denormalizationContext={
+ *          "groups"={"post"}
  *     }
  * )
  * @UniqueEntity("email")
@@ -99,7 +104,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id")}
      *      )
-     * @Groups({"read"})
+     * @ApiSubresource()
      */
     private $exercies;
 
