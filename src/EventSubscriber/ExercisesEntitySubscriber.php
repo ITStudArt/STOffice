@@ -39,9 +39,10 @@ class ExercisesEntitySubscriber implements EventSubscriberInterface
          * @var UserInterface $user
          */
         $user = $this->tokenStorage->getToken()->getUser();
-        if(!$entity instanceof User || Request::METHOD_POST !== $method)
-        {
+        if(!$entity instanceof Exercises || Request::METHOD_POST !== $method) {
             return;
         }
+        $entity->setName("TEST");
+
     }
 }

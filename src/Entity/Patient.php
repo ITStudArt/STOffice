@@ -16,13 +16,13 @@ class Patient
     /**
      * @ORM\Id
      * @ORM\OneToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="id", referencedColumnName="id",onDelete="CASCADE")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Therapist", inversedBy="id")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
      */
     private $therapist_id;
 

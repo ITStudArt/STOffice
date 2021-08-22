@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     collectionOperations={
  *     "get",
  *     "post"={
- *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *              "access_control"="is_granted('ROLE_THERAPIST')"
  *          }
  *     },
  *     itemOperations={"get"},
@@ -38,17 +38,20 @@ class Exercises
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
+     * @Groups({"post"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
+     * @Groups({"post"})
      */
     private $path;
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\ExercisesType")
-     * @ORM\JoinColumn(name="type_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="type_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @Groups({"post"})
      */
     private $type;
 

@@ -14,15 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     itemOperations={"get"},
  *     collectionOperations={
  *          "get",
- *          "post"={"access_control"="is_granted('IS_AUTHENITCATED_FULLY')"}
- *     },
- *     subresourceOperations={
- *          "api_users_exercies_get_subresource" = {
- *                 "method" = "get",
- *                 "normalizationContext"={
- *                  "groups" = {"read_type"}
- *                  }
- *          }
+ *          "post"={"access_control"="is_granted('ROLE_THERAPIST')"}
  *     },
  *     denormalizationContext={
  *          "groups"={"post"}
@@ -41,14 +33,14 @@ class ExercisesType
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * @Groups({"read_type"})
+     * @Groups({"post"})
      */
     private $type;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\NotBlank()
-     * @Groups({"read_type"})
+     * @Groups({"post"})
      */
     private $icon;
 

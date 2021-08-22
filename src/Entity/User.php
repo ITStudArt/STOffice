@@ -25,7 +25,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
  *     }
  * },
- *     collectionOperations={"post"
+ *     collectionOperations={
+ *     "post"={
+ *              "access_control"="is_granted('ROLE_ADMIN')"
+ *          }
  *     },
  *     normalizationContext={
  *     "groups" = {"read"}
@@ -38,6 +41,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface,PasswordAuthenticatedUserInterface
 {
+    const ROLE_THERAPIST = 'ROLE_THERAPIST';
+    const ROLE_PATIENT = 'ROLE_PATIENT';
+    const ROLE_DEF_USER = 'ROLE_DEF_USER';
+    const ROLE_ADMIN ='ROLE_ADMIN';
+    const ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
+
+    const DEFAULT_ROLES = [self::ROLE_DEF_USER];
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -101,16 +111,22 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      * Many Users have Many Exercises.
      * @ORM\ManyToMany(targetEntity="App\Entity\Exercises",cascade={"persist"})
      * @ORM\JoinTable(name="users_exercises",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id", onDelete="CASCADE")}
      *      )
-     * @ApiSubresource()
      */
     private $exercies;
+
+    /**
+     * @ORM\Column(type="simple_array", length=200)
+     */
+    private $roles;
+
 
 
     public function __construct(){
         $this->exercies = new ArrayCollection();
+        $this->roles = self::DEFAULT_ROLES;
     }
 
     public function getExercies()
@@ -196,6 +212,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     {
         return $this->photo;
     }
+
     public function getUsername()
     {
         return $this->email;
@@ -207,10 +224,21 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getRoles()
+
+    public function getRoles():array
     {
-        return ['ROLE_USER'];
+        return $this->roles;
     }
+
+    public function setRoles(array $roles){
+        $this->roles=$roles;
+    }
+
+    public  function addRole($role){
+        if(!$this->roles->contains($role))
+            $this->roles[] = $role;
+    }
+
     public function getSalt()
     {
         return null;

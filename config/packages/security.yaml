@@ -43,3 +43,7 @@ security:
         - { path: ^/api,       roles: IS_AUTHENTICATED_ANONYMOUSLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+    role_hierarchy:
+        ROLE_THERAPIST: ROLE_PATIENT
+        ROLE_ADMIN: ROLE_THERAPIST
+        ROLE_SUPERADMIN: ROLE_ADMIN

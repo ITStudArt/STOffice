@@ -16,7 +16,7 @@ class Therapist
     /**
      * @ORM\Id
      * @ORM\OneToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="id", referencedColumnName="id",onDelete="CASCADE")
      */
     private $id;
 
@@ -37,7 +37,7 @@ class Therapist
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Patient", mappedBy="id")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
      */
     private $therapist_patients;
 
