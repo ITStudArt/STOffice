@@ -22,29 +22,41 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *     itemOperations={
  *     "get"={
- *     "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *          "access_control"="is_granted('IS_AUTHENTICATED_FULLY')",
+ *          "normalization_context"={
+ *              "groups" = {"get"}
+ *              }
+ *     },
+ *     "put"={
+ *           "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user",
+ *           "denormalization_context"={
+ *                  "groups"={"put"}
+ *              },
+ *            "normalization_context"={
+ *                  "groups" = {"get"}
+ *                }
  *     }
  * },
  *     collectionOperations={
  *     "post"={
- *              "access_control"="is_granted('ROLE_ADMIN')"
+ *               "access_control"="is_granted('ROLE_ADMIN')",
+ *               "denormalization_context"={
+ *                  "groups"={"post"}
+ *                },
+ *               "normalization_context"={
+ *                  "groups" = {"get"}
+ *                }
  *          }
- *     },
- *     normalizationContext={
- *     "groups" = {"read"}
- *     },
- *     denormalizationContext={
- *          "groups"={"post"}
  *     }
  * )
  * @UniqueEntity("email")
  */
-class User implements UserInterface,PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     const ROLE_THERAPIST = 'ROLE_THERAPIST';
     const ROLE_PATIENT = 'ROLE_PATIENT';
     const ROLE_DEF_USER = 'ROLE_DEF_USER';
-    const ROLE_ADMIN ='ROLE_ADMIN';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
 
     const DEFAULT_ROLES = [self::ROLE_DEF_USER];
@@ -52,20 +64,20 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read"})
+     * @Groups({"get"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"read"})
+     * @Groups({"get","post","put"})
      * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"read"})
+     * @Groups({"get","post","put"})
      * @Assert\NotBlank()
      */
     private $surname;
@@ -73,22 +85,23 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email()
-     * @Groups({"get-onwer","get-admin"})
+     * @Groups({"get-onwer","get-admin","post","put"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"get-admin","post","put"})
      * @Assert\NotBlank()
      * @Assert\Regex(
      *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
      *     message="Password must be 8 letters long, contain at least one digit, one uppercase letter and one lower case."
      * )
-     * @Groups({"get-admin"})
      */
     private $password;
 
     /**
+     * @Groups({"post","put"})
      * @Assert\NotBlank()
      * @Assert\Expression(
      *     "this.getPassword() === this.getRetypedPassword()",
@@ -99,13 +112,13 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=20)
-     * @Groups({"read",})
+     * @Groups({"get","post","put"})
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"read"})
+     * @Groups({"get","post","put"})
      */
     private $photo;
 
@@ -116,18 +129,19 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id", onDelete="CASCADE")}
      *      )
+     * @Groups("get")
      */
     private $exercies;
 
     /**
      * @ORM\Column(type="simple_array", length=200)
-     * @Groups({"get-owner","get-admin"})
+     * @Groups({"get-owner","get-admin","post"})
      */
     private $roles;
 
 
-
-    public function __construct(){
+    public function __construct()
+    {
         $this->exercies = new ArrayCollection();
         $this->roles = self::DEFAULT_ROLES;
     }
@@ -142,7 +156,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      */
     public function setExercies(Exercises $exercie): void
     {
-        if(!$this->exercies->contains($exercie))
+        if (!$this->exercies->contains($exercie))
             $this->exercies[] = $exercie;
     }
 
@@ -228,17 +242,19 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRoles():array
+    public function getRoles(): array
     {
         return $this->roles;
     }
 
-    public function setRoles(array $roles){
-        $this->roles=$roles;
+    public function setRoles(array $roles)
+    {
+        $this->roles = $roles;
     }
 
-    public  function addRole($role){
-        if(!$this->roles->contains($role))
+    public function addRole($role)
+    {
+        if (!$this->roles->contains($role))
             $this->roles[] = $role;
     }
 
@@ -246,6 +262,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     {
         return null;
     }
+
     public function eraseCredentials()
     {
         return null;
