@@ -73,6 +73,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email()
+     * @Groups({"get-onwer","get-admin"})
      */
     private $email;
 
@@ -83,6 +84,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
      *     message="Password must be 8 letters long, contain at least one digit, one uppercase letter and one lower case."
      * )
+     * @Groups({"get-admin"})
      */
     private $password;
 
@@ -97,7 +99,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=20)
-     * @Groups({"read"})
+     * @Groups({"read",})
      */
     private $phone;
 
@@ -119,6 +121,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="simple_array", length=200)
+     * @Groups({"get-owner","get-admin"})
      */
     private $roles;
 
