@@ -2,13 +2,29 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\ExercisesRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
-
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=ExercisesRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={
+ *     "get",
+ *     "post"={
+ *              "access_control"="is_granted('ROLE_THERAPIST')"
+ *          }
+ *     },
+ *     itemOperations={"get"},
+ *
+ *     denormalizationContext={
+ *          "groups"={"post"}
+ *     }
+ * )
+ * @UniqueEntity(fields={"name", "path"}, message="This file already exists")
  */
 class Exercises
 {
@@ -21,16 +37,21 @@ class Exercises
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Groups({"post"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Groups({"post"})
      */
     private $path;
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\ExercisesType")
-     * @ORM\JoinColumn(name="type_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="type_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @Groups({"post"})
      */
     private $type;
 
@@ -62,4 +83,21 @@ class Exercises
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type): void
+    {
+        $this->type = $type;
+    }
+
 }

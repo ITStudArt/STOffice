@@ -5,10 +5,21 @@ namespace App\Entity;
 use App\Repository\ExercisesTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ExercisesTypeRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     itemOperations={"get"},
+ *     collectionOperations={
+ *          "get",
+ *          "post"={"access_control"="is_granted('ROLE_THERAPIST')"}
+ *     },
+ *     denormalizationContext={
+ *          "groups"={"post"}
+ *     }
+ * )
  */
 class ExercisesType
 {
@@ -21,11 +32,15 @@ class ExercisesType
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Groups({"post"})
      */
     private $type;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
+     * @Groups({"post"})
      */
     private $icon;
 
