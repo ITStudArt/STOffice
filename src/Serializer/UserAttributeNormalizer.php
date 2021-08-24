@@ -18,20 +18,21 @@ class UserAttributeNormalizer implements ContextAwareNormalizerInterface, Serial
 {
     use SerializerAwareTrait;
 
-    const USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED="USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED";
+    const USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED = "USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED";
 
     /**
      * @var TokenStorageInterface
      */
     private $tokenStorage;
+
     public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->tokenStorage=$tokenStorage;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function supportsNormalization($data, string $format = null, array $context = [])
     {
-        if(isset($context[self::USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED])){
+        if (isset($context[self::USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED])) {
             return false;
         }
         return $data instanceof User;
@@ -39,11 +40,10 @@ class UserAttributeNormalizer implements ContextAwareNormalizerInterface, Serial
 
     public function normalize($object, string $format = null, array $context = [])
     {
-        if($this->isUserHimself($object))
-        {
-            $context['groups'][]='get-owner';
+        if ($this->isUserHimself($object)) {
+            $context['groups'][] = 'get-owner';
         }
-        return $this->passOn($object,$format,$context);
+        return $this->passOn($object, $format, $context);
     }
 
     private function isUserHimself($object)
@@ -53,11 +53,11 @@ class UserAttributeNormalizer implements ContextAwareNormalizerInterface, Serial
 
     private function passOn($object, ?string $format, array $context)
     {
-        if(!$this->serializer instanceof NormalizerInterface){
-            throw new \LogicException(sprintf('Connot normalize object "%s" ',$object));
+        if (!$this->serializer instanceof NormalizerInterface) {
+            throw new \LogicException(sprintf('Connot normalize object "%s" ', $object));
         }
         $context[self::USER_ATTRIBUTE_NORMALIZER_ALREADY_CALLED] = true;
-        return $this->serializer->normalize($object,$format, $context);
+        return $this->serializer->normalize($object, $format, $context);
 
     }
 

@@ -26,7 +26,7 @@ services:
     App\Serializer\UserAttributeNormalizer:
         arguments: ['@security.token_storage']
         tags:
-            - {name: 'serializer.normalizer', priority: 64}
+            - { name: 'serializer.normalizer', priority: 64}
 
 
     # add more service definitions when explicit configuration is needed

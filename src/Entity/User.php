@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -85,13 +86,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email()
-     * @Groups({"get-onwer","get-admin","post","put"})
+     * @Groups({"get-owner","get-admin","post","put"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"get-admin","post","put"})
+     * @Groups({"get-admin","post"})
      * @Assert\NotBlank()
      * @Assert\Regex(
      *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
@@ -101,7 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $password;
 
     /**
-     * @Groups({"post","put"})
+     * @Groups({"post"})
      * @Assert\NotBlank()
      * @Assert\Expression(
      *     "this.getPassword() === this.getRetypedPassword()",
@@ -109,6 +110,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * )
      */
     private $retypedpassword;
+
+    /**
+     * @Groups({"pur-reset-password"})
+     * @Assert\NotBlank()
+     * @Assert\Regex(
+     *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
+     *     message="Password must be 8 letters long, contain at least one digit, one uppercase letter and one lower case."
+     * )
+     */
+    private $newPassword;
+
+    /**
+     * @Groups({"pur-reset-password"})
+     * @Assert\NotBlank()
+     * @Assert\Expression(
+     *     "this.getNewPassword() === this.getNewRetypedPassword()",
+     *     message="Passwords doesn't match"
+     * )
+     */
+    private $newRetypedPassowrd;
+    /**
+     * @Groups({"pur-reset-password"})
+     * @Assert\NotBlank()
+     * @UserPassword()
+     */
+    private $oldPassword;
 
     /**
      * @ORM\Column(type="string", length=20)
@@ -276,6 +303,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRetypedPassword($retypedpassword): void
     {
         $this->retypedpassword = $retypedpassword;
+    }
+
+    public function getNewPassword():?string
+    {
+        return $this->newPassword;
+    }
+
+
+    public function setNewPassword($newPassword): void
+    {
+        $this->newPassword = $newPassword;
+    }
+
+
+    public function getNewRetypedPassowrd():?string
+    {
+        return $this->newRetypedPassowrd;
+    }
+
+    public function setNewRetypedPassowrd($newRetypedPassowrd): void
+    {
+        $this->newRetypedPassowrd = $newRetypedPassowrd;
+    }
+
+    public function getOldPassword():?string
+    {
+        return $this->oldPassword;
+    }
+
+    public function setOldPassword($oldPassword): void
+    {
+        $this->oldPassword = $oldPassword;
     }
 
 
