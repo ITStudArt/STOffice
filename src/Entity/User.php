@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,6 +16,9 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Controller\ResetPasswordAction;
+use App\Entity\Exercises;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 /**
  * @ORM\MappedSuperclass()
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -29,14 +34,8 @@ use App\Controller\ResetPasswordAction;
  *              }
  *     },
  *     "put"={
- *           "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user",
- *           "denormalization_context"={
- *                  "groups"={"put"}
- *              },
- *            "normalization_context"={
- *                  "groups" = {"get"}
- *                }
- *     },
+ *             "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user"
+ *         },
  *     "put-reset-password"={
  *           "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user",
  *           "method"="PUT",
@@ -48,18 +47,35 @@ use App\Controller\ResetPasswordAction;
  *     }
  * },
  *     collectionOperations={
+ *     "get",
  *     "post"={
- *               "access_control"="is_granted('ROLE_ADMIN')",
+ *               "access_control"="is_granted('ROLE_THERAPIST')",
  *               "denormalization_context"={
  *                  "groups"={"post"}
  *                },
  *               "normalization_context"={
  *                  "groups" = {"get"}
  *                }
+ *          },
+ *     "post-exercise"={
+ *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user"
  *          }
+ *     },
+ *     denormalizationContext={
+ *         "groups"={"post-exercise"}
  *     }
  * )
  * @UniqueEntity("email")
+ */
+/*
+ *  *     "put"={
+ *              "denormalization_context"={
+ *                 "groups"={"put"}
+ *             },
+ *             "normalization_context"={
+ *                 "groups"={"get"}
+ *             }
+ *     }
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -68,7 +84,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     const ROLE_DEF_USER = 'ROLE_DEF_USER';
     const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
-
     const DEFAULT_ROLES = [self::ROLE_DEF_USER];
     /**
      * @ORM\Id
@@ -124,7 +139,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @Groups({"put-reset-password"})
-     * @Assert\NotBlank(groups={"post"})
+     * @Assert\NotBlank(groups={"put-reset-password"})
      * @Assert\Regex(
      *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
      *     message="Password must be 8 letters long, contain at least one digit, one uppercase letter and one lower case.",
@@ -135,7 +150,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @Groups({"put-reset-password"})
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(groups={"put-reset-password"})
      * @Assert\Expression(
      *     "this.getNewPassword() === this.getNewRetypedPassword()",
      *     message="Passwords doesn't match"
@@ -144,8 +159,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $newRetypedPassword;
     /**
      * @Groups({"put-reset-password"})
-     * @Assert\NotBlank()
-     * @UserPassword()
+     * @Assert\NotBlank(groups={"put-reset-password"})
+     * @UserPassword(groups={"put-reset-password"})
      */
     private $oldPassword;
 
@@ -160,17 +175,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Groups({"get","post","put"})
      */
     private $photo;
-
-    /**
-     * Many Users have Many Exercises.
-     * @ORM\ManyToMany(targetEntity="App\Entity\Exercises",cascade={"persist"})
-     * @ORM\JoinTable(name="users_exercises",
+/*
+ *      * @ORM\JoinTable(name="users_exercises",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="exercise_id", referencedColumnName="id", onDelete="CASCADE")}
      *      )
-     * @Groups("get")
+ */
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Exercises")
+     * @ORM\JoinTable()
+     * @ApiSubresource()
+     * @Groups({"post","post-exercise"})
      */
-    private $exercies;
+    private $exercises;
 
     /**
      * @ORM\Column(type="simple_array", length=200)
@@ -183,26 +200,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $passwordChangeDate;
 
-
-
     public function __construct()
     {
-        $this->exercies = new ArrayCollection();
+        $this->exercises = new ArrayCollection();
         $this->roles = self::DEFAULT_ROLES;
     }
 
-    public function getExercies()
+    public function getExercises()
     {
-        return $this->exercies;
+        return $this->exercises;
     }
-
-    /**
-     * @param Exercises $exercies
-     */
-    public function setExercies(Exercises $exercie): void
+    public function addExercise(\App\Entity\Exercises $exercies)
     {
-        if (!$this->exercies->contains($exercie))
-            $this->exercies[] = $exercie;
+        $this->exercises->add($exercies);
+        return $this;
+    }
+    public function removeExercises(Exercises $exercises)
+    {
+        $this->exercises->removeElement($exercises);
     }
 
     public function getId(): ?int
