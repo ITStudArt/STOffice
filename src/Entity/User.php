@@ -19,18 +19,25 @@ use App\Controller\ResetPasswordAction;
 use App\Entity\Exercises;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+// 37 linie "get":  *          "access_control"="is_granted('IS_AUTHENTICATED_FULLY')",
 /**
  * @ORM\MappedSuperclass()
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"patient"="Patient","therapist"="Therapist"})
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *              "roles": "exact"
+ *     }
+ *     )
  * @ApiResource(
  *     itemOperations={
  *     "get"={
- *          "access_control"="is_granted('IS_AUTHENTICATED_FULLY')",
- *          "normalization_context"={
- *              "groups" = {"get"}
+ *              "normalization_context"={
+ *                 "groups"={"get-user-exercises"}
+ *
  *              }
  *     },
  *     "put"={
@@ -89,20 +96,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"get"})
+     * @Groups({"get","get-user-exercises"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"get","post","put"})
+     * @Groups({"get","post","put","get-user-exercises"})
      * @Assert\NotBlank(groups={"post"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"get","post","put"})
+     * @Groups({"get","post","put","get-user-exercises"})
      * @Assert\NotBlank(groups={"post"})
      */
     private $surname;
@@ -111,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(groups={"post"})
      * @Assert\NotBlank(groups={"post"})
-     * @Groups({"get-owner","get-admin","post","put"})
+     * @Groups({"get-owner","get-admin","post","put","get-user-exercises"})
      */
     private $email;
 
@@ -166,13 +173,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=20)
-     * @Groups({"get","post","put"})
+     * @Groups({"get","post","put","get-user-exercises"})
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get","post","put"})
+     * @Groups({"get","post","put","get-user-exercises"})
      */
     private $photo;
 /*
@@ -185,7 +192,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\ManyToMany(targetEntity="App\Entity\Exercises")
      * @ORM\JoinTable()
      * @ApiSubresource()
-     * @Groups({"post","post-exercise"})
+     * @Groups({"post","post-exercise","get-user-exercises"})
      */
     private $exercises;
 

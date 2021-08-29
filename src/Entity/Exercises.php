@@ -45,7 +45,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *              "defaults" = {"_api_receive"=false},
  *          }
  *     },
- *     itemOperations={"get"}
+ *     itemOperations={
+ *          "get"
+ *     }
  * )
  * @UniqueEntity(fields={"name"}, message="This file already exists")
  * @Vich\Uploadable()
@@ -56,18 +58,19 @@ class Exercises
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"get-user-exercises"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get-onwer"})
+     * @Groups({"get-user-exercises"})
      */
     private $name;
 
     /**
      * @ORM\Column(nullable=true)
-     * @Groups({"get-onwer"})
+     * @Groups({"get-user-exercises"})
      */
     private $url;
 
