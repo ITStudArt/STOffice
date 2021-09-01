@@ -29,12 +29,14 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  * @ApiFilter(
  *      SearchFilter::class,
  *      properties={
- *              "roles": "exact"
+ *              "roles": "exact",
+ *              "email": "exact"
  *     }
  *     )
  * @ApiResource(
  *     itemOperations={
  *     "get"={
+ *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY')",
  *              "normalization_context"={
  *                 "groups"={"get-user-exercises"}
  *
@@ -54,7 +56,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *     }
  * },
  *     collectionOperations={
- *     "get",
+ *     "get"={
+ *     "access_control"="is_granted('ROLE_THERAPIST')"
+ *     },
  *     "post"={
  *               "access_control"="is_granted('ROLE_THERAPIST')",
  *               "denormalization_context"={
@@ -67,9 +71,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *     "post-exercise"={
  *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object == user"
  *          }
- *     },
- *     denormalizationContext={
- *         "groups"={"post-exercise"}
  *     }
  * )
  * @UniqueEntity("email")
@@ -91,7 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     const ROLE_DEF_USER = 'ROLE_DEF_USER';
     const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_SUPERADMIN = 'ROLE_SUPERADMIN';
-    const DEFAULT_ROLES = [self::ROLE_DEF_USER];
+    const DEFAULT_ROLES = [self::ROLE_PATIENT];
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -102,30 +103,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"get","post","put","get-user-exercises"})
-     * @Assert\NotBlank(groups={"post"})
+     * @Groups({"get","post","put","get-user-exercises","post-with-user"})
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"get","post","put","get-user-exercises"})
-     * @Assert\NotBlank(groups={"post"})
+     * @Groups({"get","post","put","get-user-exercises","post-with-user"})
+     * @Assert\NotBlank()
      */
     private $surname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Email(groups={"post"})
-     * @Assert\NotBlank(groups={"post"})
-     * @Groups({"get-owner","get-admin","post","put","get-user-exercises"})
+     * @Assert\Email()
+     * @Assert\NotBlank()
+     * @Groups({"get-owner","get-admin","post","put","get-user-exercises","post-with-user"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"get-admin","post"})
-     * @Assert\NotBlank(groups={"post"})
+     * @Groups({"get-admin","post","post-with-user"})
+     * @Assert\NotBlank()
      * @Assert\Regex(
      *     pattern="/(?=.*[A-Z])(?=.*[A-Z])(?=.*[0-9]).{7,}/",
      *     message="Password must be 8 letters long, contain at least one digit, one uppercase letter and one lower case."
@@ -134,8 +135,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $password;
 
     /**
-     * @Groups({"post"})
-     * @Assert\NotBlank(groups={"post"})
+     * @Groups({"post","post-with-user"})
+     * @Assert\NotBlank(groups={"put"})
      * @Assert\Expression(
      *     "this.getPassword() === this.getRetypedPassword()",
      *     message="Passwords doesn't match",
@@ -173,13 +174,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=20)
-     * @Groups({"get","post","put","get-user-exercises"})
+     * @Groups({"get","post","put","get-user-exercises","post-with-user"})
      */
     private $phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get","post","put","get-user-exercises"})
+     * @Groups({"get","post","put","get-user-exercises","post-with-user"})
      */
     private $photo;
 /*
@@ -192,13 +193,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\ManyToMany(targetEntity="App\Entity\Exercises")
      * @ORM\JoinTable()
      * @ApiSubresource()
-     * @Groups({"post","post-exercise","get-user-exercises"})
+     * @Groups({"put","post","post-exercise","get-user-exercises","post-with-user"})
      */
     private $exercises;
 
     /**
      * @ORM\Column(type="simple_array", length=200)
-     * @Groups({"get-owner","get-admin","post"})
+     * @Groups({"get-owner","get-admin","post","post-with-user"})
      */
     private $roles;
 

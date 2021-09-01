@@ -37,7 +37,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *              "order"={"name":"ASC"}
  *     },
  *     collectionOperations={
- *     "get",
+ *     "get"={
+ *     "access_control"="is_granted('ROLE_PATIENT')"
+ *     },
  *     "post-exercise"={
  *              "method"="POST",
  *              "url"="/exercises",
@@ -46,7 +48,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          }
  *     },
  *     itemOperations={
- *          "get"
+ *          "get"={
+ *     "access_control"="is_granted('ROLE_PATIENT')"
+ *     }
  *     }
  * )
  * @UniqueEntity(fields={"name"}, message="This file already exists")
@@ -96,7 +100,7 @@ class Exercises
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName($name): self
     {
         $this->name = $name;
 

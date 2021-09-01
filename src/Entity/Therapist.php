@@ -20,36 +20,46 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *              "id.name": "partial"
  *     }
  *     )
- * @ApiResource()
+ * @ApiResource(
+ *     denormalizationContext={
+ *         "groups"={"post-with-user"}
+ *     },
+ *     normalizationContext={"groups"={"post-with-user"}}
+ * )
  */
 class Therapist
 {
     /**
      * @ORM\Id
      * @ORM\OneToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id",onDelete="CASCADE")
-     * @ApiSubresource()
+     * @ORM\JoinColumn(name="id", referencedColumnName="id")
+     * @Groups({"post-with-user"})
+     * @ApiSubresource
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"post-with-user"})
      */
     private $specialization;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
+     * @Groups({"post-with-user"})
      */
     private $account_number;
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"post-with-user"})
      */
     private $hourly_rate;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Patient", mappedBy="id")
      * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
+     * @Groups({"post-with-user"})
      */
     private $therapist_patients;
 
