@@ -59,15 +59,13 @@ class AppFixtures extends Fixture
     {
         $exercise = new Exercises();
         $exercise->setName('Exercise 1');
-        $exercise->setPath('exercise_1_path');
-        $exercise->setType($this->getReference('1st_type'));
+        $exercise->setUrl("someurl");
         $this->setReference('1st_type_ex',$exercise);
         $manager->persist($exercise);
 
         $exercise = new Exercises();
         $exercise->setName('Exercise 2');
-        $exercise->setPath('exercise_2_path');
-        $exercise->setType($this->getReference('2nd_type'));
+        $exercise->setUrl("someurl2");
         $this->setReference('2nd_type_ex',$exercise);
         $manager->persist($exercise);
 
@@ -84,7 +82,7 @@ class AppFixtures extends Fixture
         $user->setPhone($this->faker->phoneNumber);
         $user->setPhoto('example_photo_path_there');
         $this->addReference('user_patient_1',$user);
-        $user->setExercies($this->getReference('1st_type_ex'));
+        $user->addExercises($this->getReference('1st_type_ex'));
         $user->setRoles([User::ROLE_PATIENT]);
         $manager->persist($user);
         $patient = new Patient();
@@ -104,7 +102,7 @@ class AppFixtures extends Fixture
         $user->setPhone($this->faker->phoneNumber);
         $user->setPhoto('example_photo_path2_there');
         $this->addReference('user_patient_2',$user);
-        $user->setExercies($this->getReference('1st_type_ex'));
+        $user->addExercises($this->getReference('1st_type_ex'));
         $user->setRoles([User::ROLE_PATIENT]);
         $manager->persist($user);
         $patient = new Patient();
@@ -138,8 +136,8 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordHasher->hashPassword($user,'admin123'));
         $user->setPhone($this->faker->phoneNumber);
         $user->setPhoto('example_photo_path_there');
-        $user->setExercies($this->getReference('1st_type_ex'));
-        $user->setExercies($this->getReference('2nd_type_ex'));
+        $user->addExercises($this->getReference('1st_type_ex'));
+        $user->addExercises($this->getReference('2nd_type_ex'));
         $user->setRoles([User::ROLE_THERAPIST]);
         $this->addReference('user_therapist_1',$user);
         $manager->persist($user);
@@ -158,7 +156,7 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordHasher->hashPassword($user,'admin123'));
         $user->setPhone($this->faker->phoneNumber);
         $user->setPhoto('example_photo_path123_there');
-        $user->setExercies($this->getReference('1st_type_ex'));
+        $user->addExercises($this->getReference('1st_type_ex'));
         $this->addReference('user_therapist_2',$user);
         $user->setRoles([User::ROLE_THERAPIST,USER::ROLE_ADMIN]);
         $manager->persist($user);

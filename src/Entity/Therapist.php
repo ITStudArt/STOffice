@@ -2,60 +2,82 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\TherapistRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ORM\Entity(repositoryClass=TherapistRepository::class)
- * @ApiResource()
+ * @ApiFilter(
+ *      SearchFilter::class,
+ *      properties={
+ *              "id.name": "partial"
+ *     }
+ *     )
+ * @ApiResource(
+ *     denormalizationContext={
+ *         "groups"={"post-with-user"}
+ *     },
+ *     normalizationContext={"groups"={"post-with-user"}}
+ * )
  */
 class Therapist
 {
     /**
      * @ORM\Id
      * @ORM\OneToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id",onDelete="CASCADE")
+     * @ORM\JoinColumn(name="id", referencedColumnName="id")
+     * @Groups({"post-with-user"})
+     * @ApiSubresource
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"post-with-user"})
      */
     private $specialization;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
+     * @Groups({"post-with-user"})
      */
     private $account_number;
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"post-with-user"})
      */
     private $hourly_rate;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Patient", mappedBy="id")
      * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
+     * @Groups({"post-with-user"})
      */
     private $therapist_patients;
 
     public function __construct()
     {
-        $this->therapist_patients = new ArrayCollection();
+        $this->therapist_patients = new PersistentCollection();
     }
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
-    public function getTherapistPatients(): ArrayCollection
+    public function getTherapistPatients(): PersistentCollection
     {
         return $this->therapist_patients;
     }
 
 
-    public function getId(): ?int
+    public function getId(): ?User
     {
         return $this->id;
     }
